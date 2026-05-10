@@ -3,9 +3,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _get_secret(key, default=None):
+    """Try Streamlit Cloud secrets first, then local .env."""
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets"):
+            return st.secrets.get(key, os.getenv(key, default))
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+
 # ========== API 配置 ==========
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+DEEPSEEK_API_KEY = _get_secret("DEEPSEEK_API_KEY")
+DEEPSEEK_BASE_URL = _get_secret("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 # ========== 模型配置 ==========
 LLM_MODEL = "deepseek-chat"
